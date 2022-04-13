@@ -29,6 +29,7 @@ int delay_time = 0; //延迟时间
 int select_op = 0;  // 选择画搜索树或者画动画过程
 int select_h = 0;   //选择的启发式函数
 int step = 0;       //扩展步数
+int pd_step = 0;
 const int digit = 8;
 const int mov[4][2] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}}; //上，右，下，左
 const char *pattern = "      ";                           //输出的填充图案
@@ -107,15 +108,15 @@ void board::output(const int type) const
                 cct_setcolor(matrix[i][j], COLOR_BLACK);
             for (int k = 0; k < 3; k++)
             {
-                cct_gotoxy(row, col + k);   //定位至第k行
-                if (k == 1 && matrix[i][j]) //如果是中间行且非空白格
+                cct_gotoxy(row, col + k);   // 定位至第k行
+                if (k == 1 && matrix[i][j]) // 如果是中间行且非空白格
                     cout << "  " << matrix[i][j] << "   ";
                 else
                     cout << pattern;
             }
-            row += 6; //定位至下一个数码
+            row += 6; // 定位至下一个数码
         }
-        col_0 += 3;  //基点坐标下移
+        col_0 += 3;  // 基点坐标下移
         row = row_0; // row col回到基点坐标
         col = col_0;
     }
@@ -254,6 +255,7 @@ void A_star(board start_state, board goal_state)
             nxt_state.gfunc = temp.gfunc + 1;
             if (s.find(nxt_state.hash_code) == s.end()) // 该节点没有访问过
             {
+                pd_step++;
                 t.push_back(nxt_state);
 #if 0
                 nxt_state.output(pd_node);
@@ -464,7 +466,7 @@ int main()
     switch (select_op)
     {
     case 1:
-        // draw_SearchTree();
+        draw_SearchTree();
         break;
     case 2:
         draw_Animation();
@@ -472,6 +474,7 @@ int main()
     }
     cout << endl;
     cout << "扩展结点数为：" << step << endl;
+    cout << "生成节点数为：" << pd_step << endl;
     cout << "搜索时间为：";
     cout << setiosflags(ios::fixed) << setprecision(6) << double(end.QuadPart - begin.QuadPart) / tick.QuadPart << "秒" << endl;
     system("pause");
