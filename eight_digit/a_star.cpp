@@ -14,75 +14,76 @@ using namespace std;
 
 using ll = long long;
 
-#define ep_node 0 //À©Õ¹½áµã
-#define pd_node 1 //Éú³É½áµã
-#define flash 2   //¶¯»­Ğ§¹û
-#define width 3   //°ËÊıÂë³¤
-#define height 3  //°ËÊıÂë¿í
-#define star_m 0  //³õÊ¼»¯starÄ£Ê½
-#define menu_m 1  //³õÊ¼»¯menuÄ£Ê½
-#define m_dist 1  //Âü¹ş¶Ù¾àÀë
-#define w_block 2 //´íÎóÎ»ÖÃµÄ¿éÊı
+#define ep_node 0 //æ‰©å±•ç»“ç‚¹
+#define pd_node 1 //ç”Ÿæˆç»“ç‚¹
+#define flash 2   //åŠ¨ç”»æ•ˆæœ
+#define width 3   //å…«æ•°ç é•¿
+#define height 3  //å…«æ•°ç å®½
+#define star_m 0  //åˆå§‹åŒ–staræ¨¡å¼
+#define menu_m 1  //åˆå§‹åŒ–menuæ¨¡å¼
+#define m_dist 1  //æ›¼å“ˆé¡¿è·ç¦»
+#define w_block 2 //é”™è¯¯ä½ç½®çš„å—æ•°
+#define h_0 3
 
-int delay_time = 0; //ÑÓ³ÙÊ±¼ä
-int select_op = 0;  // Ñ¡Ôñ»­ËÑË÷Ê÷»òÕß»­¶¯»­¹ı³Ì
-int select_h = 0;   //Ñ¡ÔñµÄÆô·¢Ê½º¯Êı
-int step = 0;       //À©Õ¹²½Êı
+int delay_time = 0; //å»¶è¿Ÿæ—¶é—´
+int select_op = 0;  // é€‰æ‹©ç”»æœç´¢æ ‘æˆ–è€…ç”»åŠ¨ç”»è¿‡ç¨‹
+int select_h = 0;   //é€‰æ‹©çš„å¯å‘å¼å‡½æ•°
+int step = 0;       //æ‰©å±•æ­¥æ•°
 const int digit = 8;
-const int mov[4][2] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}}; //ÉÏ£¬ÓÒ£¬ÏÂ£¬×ó
-const char *pattern = "      ";                           //Êä³öµÄÌî³äÍ¼°¸
+const int mov[4][2] = {{0, -1}, {-1, 0}, {0, 1}, {1, 0}}; //ä¸Šï¼Œå³ï¼Œä¸‹ï¼Œå·¦
+const char *pattern = "      ";                           //è¾“å‡ºçš„å¡«å……å›¾æ¡ˆ
 char menu_list[][128] = {
-    "»¶Ó­½øÈë°ËÊıÂëÎÊÌâ£¡",
-    "ÇëÊäÈë³õÊ¼×´Ì¬µÄ°ËÊıÂëÍ¼£º",
-    "ÇëÊäÈëÖÕÖ¹×´Ì¬µÄ°ËÊıÂëÍ¼£º",
-    "ÇëÑ¡ÔñĞèÒªÏÔÊ¾µÄ¶¯»­£º",
-    "1.ËÑË÷Ê÷",
-    "2.Çó½â¹ı³Ì",
-    "¶¯»­ÑÓÊ±£º£¨1-3 1Îª×îÂı£¬3Îª×î¿ì£©",
-    "Ñ¡ÔñÆô·¢Ê½º¯Êıh(n)£º1.Âü¹ş¶Ù¾àÀë 2.Î»ÓÚ´íÎóÎ»ÖÃµÄ¿éÊı"};
-// ´æ´¢×´Ì¬ĞÅÏ¢
+    "æ¬¢è¿è¿›å…¥å…«æ•°ç é—®é¢˜ï¼",
+    "è¯·è¾“å…¥åˆå§‹çŠ¶æ€çš„å…«æ•°ç å›¾ï¼š",
+    "è¯·è¾“å…¥ç»ˆæ­¢çŠ¶æ€çš„å…«æ•°ç å›¾ï¼š",
+    "è¯·é€‰æ‹©éœ€è¦æ˜¾ç¤ºçš„åŠ¨ç”»ï¼š",
+    "1.æœç´¢æ ‘",
+    "2.æ±‚è§£è¿‡ç¨‹",
+    "åŠ¨ç”»å»¶æ—¶ï¼šï¼ˆ1-3 1ä¸ºæœ€æ…¢ï¼Œ3ä¸ºæœ€å¿«ï¼‰",
+    "é€‰æ‹©å¯å‘å¼å‡½æ•°h(n)ï¼š1.æ›¼å“ˆé¡¿è·ç¦» 2.ä½äºé”™è¯¯ä½ç½®çš„å—æ•° 3.h(n)=0"};
+// å­˜å‚¨çŠ¶æ€ä¿¡æ¯
 struct board
 {
 public:
-    int matrix[3][3];    // ÊıÂë´æ´¢¾ØÕó
-    int index[digit][2]; // 1-8 ÊıÂëµÄ×ø±ê£¬ÓÃÀ´Ëãh(n)µÄ
+    int matrix[3][3];    // æ•°ç å­˜å‚¨çŸ©é˜µ
+    int index[digit][2]; // 1-8 æ•°ç çš„åæ ‡ï¼Œç”¨æ¥ç®—h(n)çš„
     int gfunc;           // g(n)
     int hfunc;           // h(n)
-    ll hash_code;        // ÓÃÀ´±íÊ¾×´Ì¬µÄ¹şÏ£Âë£¬±£Ö¤×´Ì¬²»Í¬¹şÏ£Âë²»Í¬£¬¼ÆËã·½Ê½ºóÃæÓĞ
-    int r0, c0;          // ¿Õ°×µÄÎ»ÖÃ
+    ll hash_code;        // ç”¨æ¥è¡¨ç¤ºçŠ¶æ€çš„å“ˆå¸Œç ï¼Œä¿è¯çŠ¶æ€ä¸åŒå“ˆå¸Œç ä¸åŒï¼Œè®¡ç®—æ–¹å¼åé¢æœ‰
+    int r0, c0;          // ç©ºç™½çš„ä½ç½®
     board(int m[][3]);
 
     void init(int m[][3]);
 
     void cal_hfunc(const board &goal_state);
 
-    void cal(); // ¸ù¾İmatrix¼ÆËãindex,hash_code,r0,c0
+    void cal(); // æ ¹æ®matrixè®¡ç®—index,hash_code,r0,c0
 
-    bool operator<(const board &b) const // ÖØÔØÔËËã·ûÊ¹ÓÅÏÈ¶ÓÁĞÄÜ¹»¸ù¾İf(n)=h(n)+g(n)ÅÅÁĞ
+    bool operator<(const board &b) const // é‡è½½è¿ç®—ç¬¦ä½¿ä¼˜å…ˆé˜Ÿåˆ—èƒ½å¤Ÿæ ¹æ®f(n)=h(n)+g(n)æ’åˆ—
     {
         return (gfunc + hfunc) > (b.gfunc + b.hfunc);
     }
 
-    bool operator==(const board &b) const // ¿ÉÒÔÖ±½Ó¸ù¾İ¹şÏ£ÂëÀ´ÅĞ¶ÏÊÇ·ñ´¦ÓÚÍ¬Ò»×´Ì¬
+    bool operator==(const board &b) const // å¯ä»¥ç›´æ¥æ ¹æ®å“ˆå¸Œç æ¥åˆ¤æ–­æ˜¯å¦å¤„äºåŒä¸€çŠ¶æ€
     {
         return hash_code == b.hash_code;
     }
 
-    void output(const int type) const; // ´òÓ¡ĞÅÏ¢µÄº¯Êı
+    void output(const int type) const; // æ‰“å°ä¿¡æ¯çš„å‡½æ•°
 };
 
 stack<board> f;
 
 void board::output(const int type) const
 {
-    int row, col;        //¹â±êµÄxy×ø±ê
-    cct_getxy(row, col); //»ñÈ¡µ±Ç°¹â±êµÄxy×ø±ê
-    if (type == pd_node) //Èç¹ûÊÇÉú³É½áµã
+    int row, col;        //å…‰æ ‡çš„xyåæ ‡
+    cct_getxy(row, col); //è·å–å½“å‰å…‰æ ‡çš„xyåæ ‡
+    if (type == pd_node) //å¦‚æœæ˜¯ç”Ÿæˆç»“ç‚¹
     {
         row += 4;
         col -= 3 * 3;
     }
-    else if (type == ep_node) //Èç¹ûÊÇÀ©Õ¹½áµã
+    else if (type == ep_node) //å¦‚æœæ˜¯æ‰©å±•ç»“ç‚¹
     {
         row = 0;
         col++;
@@ -92,30 +93,30 @@ void board::output(const int type) const
     cout << "h(n):" << setw(4) << hfunc << "  g(n):" << setw(4) << gfunc << endl;
     col++;
     cct_gotoxy(row, col);
-    int row_0 = row; //±£´æ»ùµã×ø±ê
+    int row_0 = row; //ä¿å­˜åŸºç‚¹åæ ‡
     int col_0 = col;
     for (int i = 0; i < 3; i++)
     {
         for (int j = 0; j < 3; j++)
         {
-            if (!matrix[i][j]) //Èç¹ûÊÇ¿Õ°×¸ñ
+            if (!matrix[i][j]) //å¦‚æœæ˜¯ç©ºç™½æ ¼
                 cct_setcolor(COLOR_HWHITE, COLOR_HWHITE);
-            else if (type == ep_node) //À©Õ¹ºÍÉú³É½áµã×ÖÌåÑÕÉ«²»Í¬
+            else if (type == ep_node) //æ‰©å±•å’Œç”Ÿæˆç»“ç‚¹å­—ä½“é¢œè‰²ä¸åŒ
                 cct_setcolor(matrix[i][j], COLOR_HWHITE);
             else
                 cct_setcolor(matrix[i][j], COLOR_BLACK);
             for (int k = 0; k < 3; k++)
             {
-                cct_gotoxy(row, col + k);   //¶¨Î»ÖÁµÚkĞĞ
-                if (k == 1 && matrix[i][j]) //Èç¹ûÊÇÖĞ¼äĞĞÇÒ·Ç¿Õ°×¸ñ
+                cct_gotoxy(row, col + k);   //å®šä½è‡³ç¬¬kè¡Œ
+                if (k == 1 && matrix[i][j]) //å¦‚æœæ˜¯ä¸­é—´è¡Œä¸”éç©ºç™½æ ¼
                     cout << "  " << matrix[i][j] << "   ";
                 else
                     cout << pattern;
             }
-            row += 6; //¶¨Î»ÖÁÏÂÒ»¸öÊıÂë
+            row += 6; //å®šä½è‡³ä¸‹ä¸€ä¸ªæ•°ç 
         }
-        col_0 += 3;  //»ùµã×ø±êÏÂÒÆ
-        row = row_0; // row col»Øµ½»ùµã×ø±ê
+        col_0 += 3;  //åŸºç‚¹åæ ‡ä¸‹ç§»
+        row = row_0; // row colå›åˆ°åŸºç‚¹åæ ‡
         col = col_0;
     }
     cct_setcolor();
@@ -176,6 +177,8 @@ void board::cal_hfunc(const board &goal_state)
             if (goal_state.index[i][0] != this->index[i][0] || goal_state.index[i][1] != this->index[i][1])
                 hfunc++;
     }
+    else if (select_h = h_0)
+        hfunc = 0;
 }
 
 void board::cal()
@@ -184,7 +187,7 @@ void board::cal()
     for (int i = 0; i < 3; i++)
         for (int j = 0; j < 3; j++)
         {
-            hash_code = hash_code * 10 + matrix[i][j]; // ¼ÆËã×´Ì¬¹şÏ£Âë
+            hash_code = hash_code * 10 + matrix[i][j]; // è®¡ç®—çŠ¶æ€å“ˆå¸Œç 
             if (matrix[i][j] == 0)
             {
                 r0 = i;
@@ -208,12 +211,12 @@ vector<vector<board>> info; // board[][]
 void A_star(board start_state, board goal_state)
 {
     priority_queue<board> q;
-    set<ll> s; // ±ê¼ÇÒÑ¾­ÔÚ¶ÓÁĞÖĞ»òÕßÀ©Õ¹Íê³ÉµÄ½Úµã
+    set<ll> s; // æ ‡è®°å·²ç»åœ¨é˜Ÿåˆ—ä¸­æˆ–è€…æ‰©å±•å®Œæˆçš„èŠ‚ç‚¹
     start_state.cal_hfunc(goal_state);
     start_state.gfunc = 0;
     q.push(start_state);
     s.insert(start_state.hash_code);
-    cout << "³õÊ¼×´Ì¬Îª:";
+    cout << "åˆå§‹çŠ¶æ€ä¸º:";
     start_state.output(ep_node);
     while (!q.empty())
     {
@@ -221,13 +224,13 @@ void A_star(board start_state, board goal_state)
         board temp = q.top();
         f.push(temp);
         q.pop();
-        step++; //À©Õ¹½áµãÊı+1
+        step++; //æ‰©å±•ç»“ç‚¹æ•°+1
         t.push_back(temp);
 #if 0
         cout << endl
              << endl
              << endl;
-        cout << "½«ÒªÀ©Õ¹";
+        cout << "å°†è¦æ‰©å±•";
         temp.output(ep_node);
 #endif
         if (temp == goal_state)
@@ -249,7 +252,7 @@ void A_star(board start_state, board goal_state)
             nxt_state.cal();
             nxt_state.cal_hfunc(goal_state);
             nxt_state.gfunc = temp.gfunc + 1;
-            if (s.find(nxt_state.hash_code) == s.end()) // ¸Ã½ÚµãÃ»ÓĞ·ÃÎÊ¹ı
+            if (s.find(nxt_state.hash_code) == s.end()) // è¯¥èŠ‚ç‚¹æ²¡æœ‰è®¿é—®è¿‡
             {
                 t.push_back(nxt_state);
 #if 0
@@ -265,7 +268,7 @@ void A_star(board start_state, board goal_state)
     return;
 }
 
-int cal_reverse(int array[width * height - 1]) //¼ÆËãÄæĞò¶Ô
+int cal_reverse(int array[width * height - 1]) //è®¡ç®—é€†åºå¯¹
 {
     int len = width * height - 1;
     int cnt = 0;
@@ -279,7 +282,7 @@ int cal_reverse(int array[width * height - 1]) //¼ÆËãÄæĞò¶Ô
 bool judge(int start[][height], int goal[][height])
 {
     int array1[width * height - 1] = {}, array2[width * height - 1] = {};
-    for (int i = 0, k = 0; i < width; i++) //½«¶şÎ¬Êı×é·ÅÈëÒ»Î¬Êı×éÖĞ
+    for (int i = 0, k = 0; i < width; i++) //å°†äºŒç»´æ•°ç»„æ”¾å…¥ä¸€ç»´æ•°ç»„ä¸­
         for (int j = 0; j < height; j++)
         {
             if (start[i][j] != 0)
@@ -299,19 +302,19 @@ bool judge(int start[][height], int goal[][height])
         }
     int cnt1 = cal_reverse(array1);
     int cnt2 = cal_reverse(array2);
-    return cnt1 % 2 == cnt2 % 2; //ÄæĞò¶Ô¸öÊıÏàÍ¬ ÎÊÌâÓĞ½â
+    return cnt1 % 2 == cnt2 % 2; //é€†åºå¯¹ä¸ªæ•°ç›¸åŒ é—®é¢˜æœ‰è§£
 }
 
 void init(int mode)
 {
-    cct_cls(); //ÇåÆÁ
+    cct_cls(); //æ¸…å±
     cct_setcolor();
-    cct_setconsoleborder(120, 120, 120, 9000); //ÉèÖÃ¿ØÖÆÌ¨(»º³åÇø)´óĞ¡
+    cct_setconsoleborder(120, 120, 120, 9000); //è®¾ç½®æ§åˆ¶å°(ç¼“å†²åŒº)å¤§å°
     cct_setcursor(CURSOR_VISIBLE_NORMAL);
     if (mode == star_m)
-        cct_setfontsize("ĞÂËÎÌå", 16, 8); //ÉèÖÃ×ÖÌå
+        cct_setfontsize("æ–°å®‹ä½“", 16, 8); //è®¾ç½®å­—ä½“
     else if (mode == menu_m)
-        cct_setfontsize("ĞÂËÎÌå", 24, 16); //ÉèÖÃ×ÖÌå
+        cct_setfontsize("æ–°å®‹ä½“", 24, 16); //è®¾ç½®å­—ä½“
 }
 
 void output_T(const board &b)
@@ -329,7 +332,7 @@ void draw_SearchTree()
     cct_cls();
     for (auto it = info.begin(); it != info.end(); it++)
     {
-        cout << "½«ÒªÀ©Õ¹";
+        cout << "å°†è¦æ‰©å±•";
         (*it)[0].output(ep_node);
         int len = it->size();
         for (int i = 1; i < len; i++)
@@ -388,22 +391,22 @@ int menu(int start[][height], int goal[][height])
     init(menu_m);
     cout << menu_list[0] << endl;
     cout << menu_list[1] << endl;
-    for (int i = 0; i < width; i++) //ÊäÈë°ËÊıÂë
+    for (int i = 0; i < width; i++) //è¾“å…¥å…«æ•°ç 
         for (int j = 0; j < height; j++)
             cin >> start[i][j];
     cout << menu_list[2] << endl;
     for (int i = 0; i < width; i++)
         for (int j = 0; j < height; j++)
             cin >> goal[i][j];
-    int res = judge(start, goal); //ÅĞ¶ÏÊÇ·ñÓĞ½â
+    int res = judge(start, goal); //åˆ¤æ–­æ˜¯å¦æœ‰è§£
     if (!res)
         return -1;
     cout << menu_list[7] << endl;
     cin >> select_h;
-    if (cin.fail() || select_h < 1 || select_h > 2)
+    if (cin.fail() || select_h < 1 || select_h > 3)
     {
         cin.clear();
-        select_h = m_dist; //È±Ê¡ÎªÂü¹ş¶Ù¾àÀë
+        select_h = m_dist; //ç¼ºçœä¸ºæ›¼å“ˆé¡¿è·ç¦»
     }
     cout << menu_list[3] << endl;
     cout << menu_list[4] << "   " << menu_list[5] << endl;
@@ -411,14 +414,14 @@ int menu(int start[][height], int goal[][height])
     if (cin.fail() || select_op <= 1 || select_op > 2)
     {
         cin.clear();
-        select_op = 1; // Ä¬ÈÏ»­ËÑË÷Ê÷
+        select_op = 1; // é»˜è®¤ç”»æœç´¢æ ‘
     }
 
     else
     {
         int time_op = 0;
         cout << menu_list[6] << endl;
-        cin >> time_op; //ÊäÈëÊ±¼äÑ¡Ïî
+        cin >> time_op; //è¾“å…¥æ—¶é—´é€‰é¡¹
         if (cin.fail() || time_op < 1 || time_op > 3)
         {
             cin.clear();
@@ -443,35 +446,34 @@ int main()
     int res = menu(start, goal);
     if (res == -1)
     {
-        cout << "ÎŞ·¨´Ó³õÊ¼×´Ì¬µÖ´ï×îÖÕ×´Ì¬" << endl;
+        cout << "æ— æ³•ä»åˆå§‹çŠ¶æ€æŠµè¾¾æœ€ç»ˆçŠ¶æ€" << endl;
         system("pause");
         return -1;
     }
     init(star_m);
     LARGE_INTEGER tick, begin, end;
-    QueryPerformanceFrequency(&tick); //»ñÈ¡¼ÆÊıÆ÷ÆµÂÊ
-    QueryPerformanceCounter(&begin);  //»ñÈ¡³õÊ¼¼ÇÂ¼
+    QueryPerformanceFrequency(&tick); //è·å–è®¡æ•°å™¨é¢‘ç‡
+    QueryPerformanceCounter(&begin);  //è·å–åˆå§‹è®°å½•
     A_star(board(start), board(goal));
-    QueryPerformanceCounter(&end); //»ñÈ¡ÖÕÖ¹¼ÇÂ¼
+    QueryPerformanceCounter(&end); //è·å–ç»ˆæ­¢è®°å½•
     // cout << endl
     //<< endl;
-    // cout << "ÒÑ´ïµ½Ä¿±ê×´Ì¬£¡" << endl;
-    // cout << "ÍêÕû¶¯»­Ğ§¹ûÎª£º" << endl;
+    // cout << "å·²è¾¾åˆ°ç›®æ ‡çŠ¶æ€ï¼" << endl;
+    // cout << "å®Œæ•´åŠ¨ç”»æ•ˆæœä¸ºï¼š" << endl;
     // cout << endl;
     switch (select_op)
     {
     case 1:
-        draw_SearchTree();
+        // draw_SearchTree();
         break;
     case 2:
         draw_Animation();
         break;
     }
     cout << endl;
-    cout << "À©Õ¹½áµãÊıÎª£º" << step << endl;
-    cout << "ËÑË÷Ê±¼äÎª£º";
-    cout << setiosflags(ios::fixed) << setprecision(6) << double(end.QuadPart - begin.QuadPart) / tick.QuadPart << "Ãë" << endl;
+    cout << "æ‰©å±•ç»“ç‚¹æ•°ä¸ºï¼š" << step << endl;
+    cout << "æœç´¢æ—¶é—´ä¸ºï¼š";
+    cout << setiosflags(ios::fixed) << setprecision(6) << double(end.QuadPart - begin.QuadPart) / tick.QuadPart << "ç§’" << endl;
     system("pause");
     return 0;
 }
-// 8 6 7 0 5 1 4 3 2
